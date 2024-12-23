@@ -33,28 +33,41 @@ class MediaLauncherImpl : MediaLauncher {
         cameraLauncher = activity.registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) { result ->
-            pendingCameraCallback?.let { callback ->
+            println("******************************************RESULT HERE: ${result}")
+            pendingCameraCallback.let { callback ->
+                println("******************************************CALLBACK HERE: ${callback}")
                 if (result.resultCode == Activity.RESULT_OK) {
+                    println("******************************************RESULT OK HERE: ${result}")
                     val mediaUri = result.data?.data
                     val context = currentActivity ?: return@let
 
                     if (mediaUri == null) { // Capture video does not always return data
+                        println("******************************************MEDIAURI IS NULL HERE.")
                         val videoUri = createVideoUri(context)
-                        context.contentResolver.takePersistableUriPermission(
-                            videoUri,
-                            Intent.FLAG_GRANT_READ_URI_PERMISSION
-                        )
-                        callback(MediaResult.SingleMedia(videoUri))
+                        //context.contentResolver.takePersistableUriPermission(
+                        //    videoUri,
+                        //    Intent.FLAG_GRANT_READ_URI_PERMISSION
+                        //)
+                        if (callback != null) {
+                            callback(MediaResult.SingleMedia(videoUri))
+                        }
                     } else {
-                        context.contentResolver.takePersistableUriPermission(
-                            mediaUri,
-                            Intent.FLAG_GRANT_READ_URI_PERMISSION
-                        )
-                        callback(MediaResult.SingleMedia(mediaUri))
+                        println("******************************************MEDIAURI IS NOT NULL HERE: ${mediaUri}")
+                        //context.contentResolver.takePersistableUriPermission(
+                        //    mediaUri,
+                        //    Intent.FLAG_GRANT_READ_URI_PERMISSION
+                        //)
+                        if (callback != null) {
+                            callback(MediaResult.SingleMedia(mediaUri))
+                        }
                     }
                 } else {
-                    callback(MediaResult.Canceled)
+                    println("RESULT NOT OK HERE: ${result}")
+                    if (callback != null) {
+                        callback(MediaResult.Canceled)
+                    }
                 }
+                println("******************************************CAMERA CALLBACK BEING SET TO NULL.")
                 pendingCameraCallback = null
             }
         }
@@ -102,6 +115,7 @@ class MediaLauncherImpl : MediaLauncher {
 
     @Composable
     override fun launchCamera(onMediaCaptured: (MediaResult) -> Unit) {
+        println("******************************************LAUNCHING CAMERA.")
         val context = currentActivity ?: return
         pendingCameraCallback = onMediaCaptured
 
@@ -121,6 +135,8 @@ class MediaLauncherImpl : MediaLauncher {
 
     @Composable
     override fun launchGallery(onMediaSelected: (MediaResult) -> Unit) {
+        println("******************************************LAUNCHING GALLERY.")
+        val context = currentActivity ?: return
         pendingGalleryCallback = onMediaSelected
 
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
