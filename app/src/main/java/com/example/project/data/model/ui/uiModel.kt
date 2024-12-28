@@ -2,7 +2,6 @@ package com.example.project.data.model.ui
 
 import com.example.project.data.model.domain.Location
 import com.google.firebase.Timestamp
-import com.google.firebase.firestore.GeoPoint
 
 
 data class SightingCard(

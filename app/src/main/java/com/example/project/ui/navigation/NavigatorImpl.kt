@@ -57,4 +57,8 @@ class NavigatorImpl:Navigator, KoinComponent {
     override fun navToProfile() {
         navController.navigate(Screen.ProfileScreen.route)
     }
+
+    override fun navToSightingsList() {
+        navController.navigate(Screen.SightingListScreen.route)
+    }
 }

@@ -16,19 +16,27 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import com.example.project.ui.screen.sightings.SightingCard
+import com.example.project.ui.viewmodel.ProfileViewModel
 import com.example.project.ui.viewmodel.SightingsEvent
+import com.example.project.ui.viewmodel.SightingsViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen() {
+    val viewModel: ProfileViewModel = koinViewModel()
+    //The state we expose to UI. Read-Only
+    val state by viewModel.state.collectAsState()
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Profile") },
                 navigationIcon = {
-                    IconButton(onClick = {  }) {
+                    IconButton(onClick = { viewModel.handleEvent(ProfileViewModel.ProfileEvent.NavigateBack) }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Pop backstack")
                     }
                 }

@@ -13,5 +13,5 @@ interface Navigator {
     fun navToNewSighting()
     fun navToMap()
     fun navToProfile()
-
+    fun navToSightingsList()
 }

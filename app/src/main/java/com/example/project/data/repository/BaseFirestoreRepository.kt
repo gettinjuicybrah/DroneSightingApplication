@@ -16,7 +16,6 @@ abstract class BaseFirestoreRepository<T : Any>(private val collectionName: Stri
 
     abstract fun fromDocument(document: DocumentSnapshot): T?
 
-
     fun post(item: T, documentId: String? = null): Flow<Boolean> = callbackFlow {
         val docRef = if (documentId != null) {
             firestore.collection(collectionName).document(documentId)
@@ -61,6 +60,7 @@ abstract class BaseFirestoreRepository<T : Any>(private val collectionName: Stri
                 close(error)
                 return@addSnapshotListener
             }
+
             val items = snapshot?.documents?.mapNotNull { doc ->
                 fromDocument(doc)
             } ?: emptyList()

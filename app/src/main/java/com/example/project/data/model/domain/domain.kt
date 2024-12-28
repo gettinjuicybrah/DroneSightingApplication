@@ -27,14 +27,13 @@ data class Sighting(
     val title: String = "",
     val postDate: Timestamp? = null,
     val sightingDate: Timestamp? = null,
-    val location: Location = Location(),
-    val mediaUrls: List<String> = emptyList(),
+    val location: Location? = null,
+    var mediaUrls: List<String> = emptyList(),
     val description: String? = null,
     var commentCount: Int = 0,
     var upvotes: Int = 0,
     var downvotes: Int = 0,
 )
-
 
 data class SightingComment(
     val commentId: String = "", // Auto-generated

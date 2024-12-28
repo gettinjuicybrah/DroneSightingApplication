@@ -1,13 +1,12 @@
 package com.example.project.ui.viewmodel
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.project.data.model.domain.Sighting
 import com.example.project.data.model.ui.SightingCard
-import com.example.project.data.repository.FirestoreRepository
 import com.example.project.data.repository.SightingRepository
+import com.example.project.service.FirebaseAuthService
 import com.example.project.ui.navigation.NavigatorImpl
+import kotlinx.coroutines.channels.Channel
 
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -22,16 +21,21 @@ class SightingsViewModel:ViewModel(), KoinComponent {
     private val _state = MutableStateFlow<List<SightingCard>>(emptyList())
     val state: StateFlow<List<SightingCard>> = _state.asStateFlow()
 
+    private val authService: FirebaseAuthService by inject()
+    // Define a Channel for one-time events
+    private val _event = Channel<UiEvent>(Channel.BUFFERED)
+    val eventFlow = _event.receiveAsFlow()
     init {
         attemptDataLoad()
     }
 
     fun handleEvent(event: SightingsEvent) {
         when (event) {
-            is SightingsEvent.NavigateToNewSighting -> navigateToNewSighting()
+            is SightingsEvent.NavigateToNewSighting -> determineAuthThen({ navigateToNewSighting() })
             is SightingsEvent.NavigateToSettings -> navigateToSettings()
             is SightingsEvent.NavigateToSighting -> navigateToSighting()
             is SightingsEvent.NavigateToProfile -> navigateToProfile()
+            is SightingsEvent.NavigateToLogin -> navigator.navToLogin()
         }
     }
 
@@ -42,6 +46,25 @@ class SightingsViewModel:ViewModel(), KoinComponent {
                     _state.update { sightings.map { sighting -> sighting.toSightingCard() }}
                 }
         }
+    }
+
+    private fun determineAuthThen(action: () -> Unit, callback: () -> Unit = {} ) {
+        if (authService.isLoggedIn) {
+            action()
+        } else {
+            showNotLoggedInSnackbar()
+        }
+    }
+
+    // Function to emit a snackbar event
+    fun showNotLoggedInSnackbar() {
+        viewModelScope.launch {
+            _event.send(UiEvent.ShowSnackbar("You must be logged in to do that!", "Login"))
+        }
+    }
+
+    private fun notLoggedIn():String{
+        return "You must be logged in to do that!"
     }
 
     fun deleteSighting(sightingId: String) {
@@ -81,12 +104,18 @@ class SightingsViewModel:ViewModel(), KoinComponent {
     private fun navigateToSighting(){
         navigator.navToSighting()
     }
-
+    // UI Event class to represent different events
+    sealed class UiEvent {
+        data class ShowToast(val message: String) : UiEvent()
+        data class ShowSnackbar(val message: String, val actionLabel: String) : UiEvent()
+    }
 }
 sealed class SightingsEvent {
     object NavigateToNewSighting: SightingsEvent()
     object NavigateToSighting: SightingsEvent()
     object NavigateToProfile: SightingsEvent()
     object NavigateToSettings: SightingsEvent()
+    object NavigateToLogin: SightingsEvent()
+
 
 }
