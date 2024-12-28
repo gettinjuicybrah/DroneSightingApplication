@@ -48,6 +48,7 @@ class RegisterViewModel: ViewModel(), KoinComponent {
                 if (success) {
                     // Handle successful registration
                     Log.d("Auth", "User registered successfully!")
+                    navigator.popBackStack()
                 } else {
                     // Handle failure
                     Log.e("Auth", "Registration failed: $error")
