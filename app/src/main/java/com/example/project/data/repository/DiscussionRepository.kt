@@ -8,7 +8,17 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+/**
+ * Repository for managing discussions in Firestore.
+ * Extends BaseFirestoreRepository to inherit common Firestore operations.
+ */
 class DiscussionRepository : BaseFirestoreRepository<Discussion>("discussions"), KoinComponent {
+    /**
+     * Converts a Firestore document into a Discussion domain model.
+     *
+     * @param document The Firestore document snapshot.
+     * @return A Discussion instance or null if conversion fails.
+     */
     override fun fromDocument(document: DocumentSnapshot): Discussion? {
         return try {
             val discussionId = document.id

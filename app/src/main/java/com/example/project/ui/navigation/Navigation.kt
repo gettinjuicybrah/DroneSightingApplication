@@ -1,3 +1,4 @@
+// This file defines the navigation setup for the app using Jetpack Compose's navigation component.
 package com.example.project.ui.navigation
 
 import androidx.compose.runtime.Composable
@@ -16,16 +17,18 @@ import com.example.project.ui.screen.user.*
 import com.example.project.ui.screen.auth.*
 import com.example.project.ui.screen.SplashScreen
 
-
-
+// Composable function that sets up the navigation host for the app.
 @Composable
 fun NavHostController() {
+    // Create and remember a NavController to manage navigation state across recompositions.
     val navController = rememberNavController()
+    // Inject NavigatorImpl via Koin for custom navigation logic.
     val navigator: NavigatorImpl = koinInject()
-
+    // Use LaunchedEffect to initialize the navigator with the navController once on first composition.
     LaunchedEffect(navController) {
         navigator.initialize(navController)
     }
+    // Define the navigation graph with NavHost, starting at the SightingListScreen.
     NavHost(navController = navController, startDestination = Screen.SightingListScreen.route) {
         composable(route = Screen.SightingListScreen.route) {
             SightingListScreen()

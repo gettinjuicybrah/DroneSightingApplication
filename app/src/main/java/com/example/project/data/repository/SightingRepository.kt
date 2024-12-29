@@ -8,9 +8,20 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.storage.FirebaseStorage
 import org.koin.core.component.KoinComponent
-
+/**
+ * Repository for managing sightings in Firestore.
+ * Extends BaseFirestoreRepository to inherit common Firestore operations.
+ * Includes additional functionality for uploading media files to Firebase Storage.
+ */
 class SightingRepository : BaseFirestoreRepository<Sighting>("sightings"), KoinComponent {
+    // Initialize FirebaseStorage instance for handling media uploads.
     val firebaseStorage = FirebaseStorage.getInstance()
+    /**
+     * Converts a Firestore document into a Sighting domain model.
+     *
+     * @param document The Firestore document snapshot.
+     * @return A Sighting instance or null if conversion fails.
+     */
     override fun fromDocument(document: DocumentSnapshot): Sighting? {
         return try {
             val sightingId = document.id
@@ -25,13 +36,7 @@ class SightingRepository : BaseFirestoreRepository<Sighting>("sightings"), KoinC
             val commentCount = document.getLong("commentCount")?.toInt() ?: 0
             val upvotes = document.getLong("upvotes")?.toInt() ?: 0
             val downvotes = document.getLong("downvotes")?.toInt() ?: 0
-/*
-            val downloadUrls = mediaUrls.map { mediaUrl ->
-                val storageRef = firebaseStorage.reference.child(mediaUrl) // Replace with path construction logic
-                storageRef.getDownloadUrl() // This will block the coroutine, consider using async/await
-            }
 
- */
 
             Sighting(
                 sightingId = sightingId,
@@ -51,6 +56,14 @@ class SightingRepository : BaseFirestoreRepository<Sighting>("sightings"), KoinC
             null
         }
     }
+    /**
+     * Uploads media files to Firebase Storage and saves the sighting data to Firestore.
+     * If no files are provided, it saves the sighting directly.
+     *
+     * @param fileUris List of URIs for media files to upload.
+     * @param sighting The sighting data to save.
+     * @param onComplete Callback invoked with true on success, false on failure.
+     */
     fun uploadMediaAndSaveSighting(
         fileUris: List<Uri>,
         sighting: Sighting,
@@ -107,31 +120,5 @@ class SightingRepository : BaseFirestoreRepository<Sighting>("sightings"), KoinC
                 }
         }
     }
-    /*
-    fun uploadImageAndSaveUrl(
-        fileUri: Uri,
-        sightingId: String,
-        sightingData: Map<String, Any?>,
-        onComplete: (Boolean) -> Unit
-    ) {
-        val storageRef = firebaseStorage.reference.child("sightings-media/${fileUri.lastPathSegment}")
-        val uploadTask = storageRef.putFile(fileUri)
-        uploadTask
-            .addOnSuccessListener {
-                storageRef.downloadUrl
-                    .addOnSuccessListener { uri ->
-                        val downloadUrl = uri.toString()
-                        // Update Firestore document with the download URL and other sighting data
-                        val updatedSightingData = sightingData.toMutableMap()
-                        updatedSightingData["mediaUrls"] = FieldValue.arrayUnion(downloadUrl)
-                        firestore.collection("sightings").document(sightingId)
-                            .set(updatedSightingData, SetOptions.merge())
-                            .addOnSuccessListener { onComplete(true) }
-                            .addOnFailureListener { onComplete(false) }
-                    }
-                    .addOnFailureListener { onComplete(false) }
-            }
-            .addOnFailureListener { onComplete(false) }
-    }
-     */
+
 }

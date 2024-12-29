@@ -96,7 +96,7 @@ import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
 
 import com.example.project.service.getRelativeTime
-
+// This composable function defines the UI for displaying a list of reported drone sightings.
 @OptIn(ExperimentalMaterial3Api::class, KoinExperimentalAPI::class)
 @Composable
 fun SightingListScreen() {
@@ -105,7 +105,7 @@ fun SightingListScreen() {
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
-    // Listen for events in the way of lifecycle effect
+    // Listen for UI events such as toasts or snackbars using a LaunchedEffect
     LaunchedEffect(Unit) {
         viewModel.eventFlow.collect { event ->
             when (event) {
@@ -127,6 +127,7 @@ fun SightingListScreen() {
             }
         }
     }
+    // Scaffold provides the basic layout structure with top bar, FAB, bottom bar, and content
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
@@ -146,6 +147,7 @@ fun SightingListScreen() {
         },
 
         floatingActionButton = {
+            // FAB to navigate to the new sighting reporting screen
             FloatingActionButton(onClick = { viewModel.handleEvent(SightingsEvent.NavigateToNewSighting) }) {
                 Icon(
                     Icons.Filled.Add,
@@ -155,32 +157,26 @@ fun SightingListScreen() {
         },
 
         bottomBar = {
+            // BottomAppBar with a home icon for navigation
             BottomAppBar(
                 actions = {
-                    IconButton(onClick = { /* do something */ }) {
+                    IconButton(onClick = { /* Placeholder for home action */ }) {
                         Icon(Icons.Filled.Home, contentDescription = "Drone Sightings List")
                     }
-                    /*
-                                        IconButton(onClick = { viewModel.handleEvent(SightingsEvent.NavigateToNewSighting) }) {
-                                            Icon(
-                                                Icons.Filled.Add,
-                                                contentDescription = "Report Drone Sighting",
-                                            )
-                                        }
 
-                     */
                 }
             )
         }
     ) { padding ->
+        // LazyColumn displays a scrollable list of sighting cards
         LazyColumn(modifier = Modifier.padding(padding)) {
             items(state) { sighting ->
-                SightingCard(sighting, context)
+                SightingCard(sighting, context) // Displays each sighting as a card
             }
         }
     }
 }
-
+// This composable function defines the UI for a single sighting card.
 @Composable
 fun SightingCard(sighting: SightingCard, context: Context, modifier: Modifier = Modifier) {
     Card(
@@ -267,13 +263,13 @@ fun SightingCard(sighting: SightingCard, context: Context, modifier: Modifier = 
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Media Pager
+            // Media pager for displaying attached images or videos
             if (!sighting.mediaUrls.isNullOrEmpty()) {
                 MediaPager(mediaList = sighting.mediaUrls, context)
                 Spacer(modifier = Modifier.height(8.dp))
             }
 
-            // Footer: Comments
+            // Footer row with comment count
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -293,35 +289,10 @@ fun SightingCard(sighting: SightingCard, context: Context, modifier: Modifier = 
     }
 }
 
-/*
-@Composable
-fun SightingCard(sighting: SightingCard, context: Context) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
-        //elevation = 4.dp
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            // Header: User and metadata
-            Text(text = "location: ${sighting.location.toString()} - postdate: ${sighting.postDate.toString()}")
-            Text(text = "title: ${sighting.title}", style = TextStyle(fontWeight = FontWeight.Bold))
-            Text(text = "username: ${sighting.username} - sighting date:${sighting.sightingDate} Hours")
-            Box() {
-
-                sighting.mediaUrls?.let { MediaPager(it, context) }
-
-            }
-            // Footer: Comments and actions
-            Text(text = "Comment amnt: ${sighting.commentCount}")
-        }
-
-    }
-}
-
- */
+// This composable function displays a horizontal pager for media (images or videos) in a sighting.
 @Composable
 fun MediaPager(mediaList: List<String>, context: Context) {
+    // Pager state to manage current page and total page count
     val pagerState = rememberPagerState(
         initialPage = 0,
         pageCount = { mediaList.size }
@@ -331,6 +302,7 @@ fun MediaPager(mediaList: List<String>, context: Context) {
         modifier = Modifier
             .fillMaxWidth()
     ) {
+        // HorizontalPager to swipe through media items
         HorizontalPager(
             state = pagerState,
             modifier = Modifier
@@ -341,8 +313,10 @@ fun MediaPager(mediaList: List<String>, context: Context) {
             if (mediaUrl.endsWith(".mp4") ||
                 mediaUrl.contains("video", ignoreCase = true)
             ) {
+                // Displays video if the URL indicates a video file
                 VideoPlayer(url = mediaUrl)
             } else {
+                // Displays image with crossfade effect
                 val imageRequest = remember {
                     ImageRequest.Builder(context)
                         .data(mediaUrl)
@@ -362,7 +336,7 @@ fun MediaPager(mediaList: List<String>, context: Context) {
         }
 
         Spacer(modifier = Modifier.height(8.dp))
-
+        // Animated indicator for the pager
         AnimatedPagerIndicator(
             pagerState = pagerState,
             modifier = Modifier.fillMaxWidth(),
@@ -374,7 +348,7 @@ fun MediaPager(mediaList: List<String>, context: Context) {
         )
     }
 }
-
+// This composable function displays an animated pager indicator for the media pager.
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun AnimatedPagerIndicator(
@@ -387,7 +361,7 @@ fun AnimatedPagerIndicator(
     spacing: Dp = 4.dp
 ) {
     var currentPage by remember { mutableStateOf(0) }
-
+    // Update current page based on pager state changes
     LaunchedEffect(pagerState) {
         snapshotFlow { pagerState.currentPage }
             .distinctUntilChanged()
@@ -426,25 +400,26 @@ fun AnimatedPagerIndicator(
         }
     }
 }
-
+// This composable function plays a video using ExoPlayer.
 @Composable
 fun VideoPlayer(url: String) {
     val context = LocalContext.current
+    // Initialize ExoPlayer with the video URL
     val exoPlayer = remember {
         ExoPlayer.Builder(context).build().apply {
             val mediaItem = MediaItem.fromUri(url)
             setMediaItem(mediaItem)
-            playWhenReady = true // You can set this to true if you want autoplay
+            playWhenReady = true
             prepare()
         }
     }
-
+    // Release ExoPlayer resources when the composable is disposed
     DisposableEffect(LocalLifecycleOwner.current) {
         onDispose {
             exoPlayer.release()
         }
     }
-
+    // AndroidView to embed the ExoPlayer's PlayerView in Compose
     AndroidView(
         factory = {
             PlayerView(it).apply {
@@ -454,6 +429,6 @@ fun VideoPlayer(url: String) {
         },
         modifier = Modifier
             .fillMaxWidth()
-            .aspectRatio(16f / 9f) // Adjust aspect ratio as needed
+            .aspectRatio(16f / 9f)
     )
 }

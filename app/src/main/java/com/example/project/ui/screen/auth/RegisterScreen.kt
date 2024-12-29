@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import com.example.project.ui.viewmodel.RegisterEvent
 import com.example.project.ui.viewmodel.RegisterViewModel
 import org.koin.compose.viewmodel.koinViewModel
-
+// This composable function defines the UI for the Register screen of the app.
 @Composable
 fun RegisterScreen(){
     val viewModel: RegisterViewModel = koinViewModel()

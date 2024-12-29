@@ -34,11 +34,10 @@ fun BottomNavigationBar(
         BottomNavItem("profile", Icons.Filled.Person, "Profile"),
         BottomNavItem("settings", Icons.Filled.Settings, "Settings")
     )
-
+    // BottomAppBar provides the container for navigation icons
     BottomAppBar(
         modifier = Modifier.fillMaxWidth(),
-        //backgroundColor = MaterialTheme.colors.primarySurface, // Customize background color
-        contentPadding = PaddingValues(horizontal = 16.dp) // Add horizontal padding if needed
+        contentPadding = PaddingValues(horizontal = 16.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -46,10 +45,8 @@ fun BottomNavigationBar(
             verticalAlignment = Alignment.CenterVertically
         ) {
             items.forEach { item ->
-                // Custom implementation for the bottom navigation item
                 IconButton(
                     onClick = { onNavigationItemClick(item.route) },
-                    //contentPadding = PaddingValues(0.dp) // Remove default padding
                 ) {
                     Icon(
                         imageVector = item.icon,

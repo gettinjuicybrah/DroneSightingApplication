@@ -28,9 +28,6 @@ val sharedModule = module {
     viewModelOf(::RegisterViewModel)
     viewModelOf(::ProfileViewModel)
     viewModelOf(::SettingsViewModel)
-    //viewModelOf(::SightingViewModel)
-    //viewModelOf(::DiscussionViewModel)
-   // viewModelOf(::NewDiscussionViewModel)
 }
 
 val firebaseModule = module {

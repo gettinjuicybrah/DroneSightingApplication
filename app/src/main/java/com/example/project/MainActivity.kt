@@ -29,61 +29,14 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-
         initKoin()
         val mediaLauncher: MediaLauncherImpl by inject()
         mediaLauncher.initialize(this)
 
         setContent {
             DroneSightingAppTheme {
-                //initKoin()
                 NavHostController()
-
-                /*
-                                // Temporary check to verify firebase
-                                var isUserSignedIn by remember { mutableStateOf(false) }
-
-
-                                // Check if a user is signed in or not on app startup
-                                isUserSignedIn = Firebase.auth.currentUser != null
-                                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                                    if (isUserSignedIn)
-                                        Greeting(
-                                            "User is signed in",
-                                            modifier = Modifier.padding(innerPadding)
-                                        )
-                                    //androidx.compose.material3.Text("User is signed in")
-                                    else
-                                        Greeting(
-                                            "User is NOT signed in",
-                                            modifier = Modifier.padding(innerPadding)
-                                        )
-
-                                }
-
-                 */
-
-
             }
-
-
         }
-    }
-}
-
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    DroneSightingAppTheme {
-        Greeting("Android")
     }
 }

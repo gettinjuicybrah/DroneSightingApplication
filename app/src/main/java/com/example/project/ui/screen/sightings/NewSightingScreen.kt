@@ -63,12 +63,16 @@ import coil3.compose.AsyncImage
 fun NewSightingScreen() {
     val viewModel: NewSightingViewModel = koinViewModel()
     val state by viewModel.state.collectAsState()
+    // Collect lists of selected images and videos from the ViewModel
     val images = viewModel.selectedImages.collectAsState().value
     val videos = viewModel.selectedVideos.collectAsState().value
 
+    // Access the media launcher from the ViewModel for capturing or selecting media
     val mediaLauncher = viewModel.mediaLauncher
-    var showMenu by remember { mutableStateOf(false) } // State for the menu
-    var launchMedia by remember { mutableStateOf<MediaLaunchType?>(null) } // State for media launch
+    // State to control the visibility of the media attachment menu
+    var showMenu by remember { mutableStateOf(false) }
+    // State to determine which media type to launch (camera or gallery)
+    var launchMedia by remember { mutableStateOf<MediaLaunchType?>(null) }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -93,7 +97,7 @@ fun NewSightingScreen() {
                             contentDescription = "Attach file."
                         )
                     }
-                    //Menu Implementation
+                    // Dropdown menu for selecting media source (camera or gallery)
                     DropdownMenu(
                         expanded = showMenu,
                         onDismissRequest = { showMenu = false }
@@ -116,7 +120,7 @@ fun NewSightingScreen() {
                 }
             )
         }) { paddingValues ->
-
+        // Column arranges UI elements vertically with padding
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -125,6 +129,7 @@ fun NewSightingScreen() {
         ) {
 
             Spacer(modifier = Modifier.height(16.dp))
+            // Displays thumbnails of attached images and videos in a horizontal scrollable row
             if (images.isNotEmpty() || videos.isNotEmpty()) {
                 LazyRow(
                     modifier = Modifier.fillMaxWidth(),
@@ -163,7 +168,7 @@ fun NewSightingScreen() {
             )
         }
     }
-
+    // Handles media launching based on user selection from the menu
     when (launchMedia) {
         MediaLaunchType.Camera -> {
             mediaLauncher.launchCamera { result ->
@@ -179,10 +184,11 @@ fun NewSightingScreen() {
             launchMedia = null
         }
 
-        null -> {}
+        null -> {} // No action if no media launch is requested
 
     }
 }
+// Composable function to display a thumbnail of an attached media file with a remove option
 @Composable
 private fun AttachmentThumbnail(
     uri: String,
@@ -201,7 +207,7 @@ private fun AttachmentThumbnail(
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )
-
+        // Icon button to remove the attachment
         IconButton(
             onClick = onRemove,
             modifier = Modifier
@@ -217,6 +223,7 @@ private fun AttachmentThumbnail(
         }
     }
 }
+// Enum to define types of media launches
 enum class MediaLaunchType {
     Camera, Gallery
 }

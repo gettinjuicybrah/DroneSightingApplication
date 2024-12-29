@@ -41,9 +41,11 @@ fun SettingsScreen() {
                 }
             )
         }){ padding ->
+        // LazyColumn displays a scrollable list of settings items
+        // Currently a placeholder with no items
         LazyColumn(modifier = Modifier.padding(padding)) {
             items(0) { info ->
-                Text(text = "settings information")
+                Text(text = "settings information") // Placeholder text for future settings items
             }
         }
 

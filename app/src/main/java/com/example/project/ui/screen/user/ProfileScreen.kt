@@ -24,7 +24,7 @@ import com.example.project.ui.viewmodel.ProfileViewModel
 import com.example.project.ui.viewmodel.SightingsEvent
 import com.example.project.ui.viewmodel.SightingsViewModel
 import org.koin.compose.viewmodel.koinViewModel
-
+// This composable function defines the UI for the Profile screen of the app.
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen() {
@@ -42,9 +42,11 @@ fun ProfileScreen() {
                 }
             )
         }){ padding ->
+        // LazyColumn displays a scrollable list of profile information
+        // Currently a placeholder with no items
         LazyColumn(modifier = Modifier.padding(padding)) {
             items(0) { info ->
-                Text(text = "Profile information")
+                Text(text = "Profile information") // Placeholder text for future profile items
             }
         }
 

@@ -12,12 +12,15 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-
+/**
+ * ViewModel for managing the list of sightings.
+ * Handles data loading, navigation, and authentication checks for user actions.
+ */
 class SightingsViewModel:ViewModel(), KoinComponent {
 
     private val navigator: NavigatorImpl by inject()
     private val sightingRepository: SightingRepository by inject()
-
+    // State flow for the list of sighting cards displayed in the UI
     private val _state = MutableStateFlow<List<SightingCard>>(emptyList())
     val state: StateFlow<List<SightingCard>> = _state.asStateFlow()
 
@@ -26,9 +29,13 @@ class SightingsViewModel:ViewModel(), KoinComponent {
     private val _event = Channel<UiEvent>(Channel.BUFFERED)
     val eventFlow = _event.receiveAsFlow()
     init {
+        // Load sighting data when the ViewModel is initialized
         attemptDataLoad()
     }
-
+    /**
+     * Handles events for the sightings screen.
+     * Manages navigation and ensures authentication for certain actions.
+     */
     fun handleEvent(event: SightingsEvent) {
         when (event) {
             is SightingsEvent.NavigateToNewSighting -> determineAuthThen({ navigateToNewSighting() })
@@ -38,7 +45,10 @@ class SightingsViewModel:ViewModel(), KoinComponent {
             is SightingsEvent.NavigateToLogin -> navigator.navToLogin()
         }
     }
-
+    /**
+     * Loads all sightings from the repository and updates the UI state.
+     * Runs in a coroutine to handle asynchronous data fetching.
+     */
     private fun attemptDataLoad() {
         viewModelScope.launch {
             sightingRepository.getAll()
@@ -47,7 +57,12 @@ class SightingsViewModel:ViewModel(), KoinComponent {
                 }
         }
     }
-
+    /**
+     * Checks if the user is authenticated before executing an action.
+     * If not logged in, triggers a snackbar notification.
+     * @param action The action to perform if authenticated.
+     * @param callback Optional callback after the action (currently unused).
+     */
     private fun determineAuthThen(action: () -> Unit, callback: () -> Unit = {} ) {
         if (authService.isLoggedIn) {
             action()
@@ -56,23 +71,29 @@ class SightingsViewModel:ViewModel(), KoinComponent {
         }
     }
 
-    // Function to emit a snackbar event
+    /**
+     * Emits a snackbar event to notify the user they must log in.
+     */
     fun showNotLoggedInSnackbar() {
         viewModelScope.launch {
             _event.send(UiEvent.ShowSnackbar("You must be logged in to do that!", "Login"))
         }
     }
 
-    private fun notLoggedIn():String{
-        return "You must be logged in to do that!"
-    }
-
+    /**
+     * Placeholder function for deleting a sighting (currently unimplemented).
+     * @param sightingId The ID of the sighting to delete.
+     */
     fun deleteSighting(sightingId: String) {
         viewModelScope.launch {
-
+            // TODO: Implement deletion logic
         }
     }
 
+    /**
+     * Extension function to convert a domain Sighting to a UI SightingCard.
+     * @return A SightingCard object for display purposes.
+     */
     fun Sighting.toSightingCard(): SightingCard {
         return SightingCard(
             sightingId = sightingId,
@@ -104,12 +125,17 @@ class SightingsViewModel:ViewModel(), KoinComponent {
     private fun navigateToSighting(){
         navigator.navToSighting()
     }
-    // UI Event class to represent different events
+    /**
+     * Sealed class representing one-time UI events.
+     */
     sealed class UiEvent {
         data class ShowToast(val message: String) : UiEvent()
         data class ShowSnackbar(val message: String, val actionLabel: String) : UiEvent()
     }
 }
+/**
+ * Sealed class defining possible events for the sightings screen.
+ */
 sealed class SightingsEvent {
     object NavigateToNewSighting: SightingsEvent()
     object NavigateToSighting: SightingsEvent()

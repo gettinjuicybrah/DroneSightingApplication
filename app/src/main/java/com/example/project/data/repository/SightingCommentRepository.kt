@@ -8,7 +8,17 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+/**
+ * Repository for managing sighting comments in Firestore.
+ * Extends BaseFirestoreRepository to inherit common Firestore operations.
+ */
 class SightingCommentRepository : BaseFirestoreRepository<SightingComment>("sightings"), KoinComponent {
+    /**
+     * Converts a Firestore document into a SightingComment domain model.
+     *
+     * @param document The Firestore document snapshot.
+     * @return A SightingComment instance or null if conversion fails.
+     */
     override fun fromDocument(document: DocumentSnapshot): SightingComment? {
         return try {
             val commentId = document.id
@@ -36,7 +46,14 @@ class SightingCommentRepository : BaseFirestoreRepository<SightingComment>("sigh
             null
         }
     }
-
+    /**
+     * Retrieves all comments for a specific sighting from its "sightingComments" subcollection.
+     *
+     * @param sightingId The ID of the sighting.
+     * @param orderBy Optional field to order the results by.
+     * @param direction Optional direction for ordering.
+     * @return A Flow emitting a list of SightingComment objects.
+     */
     fun getSightingComments(sightingId: String, orderBy: String? = null, direction: Query.Direction? = null):  Flow<List<SightingComment>> {
         return getSubCollection(sightingId, "sightingComments", orderBy, direction)
     }

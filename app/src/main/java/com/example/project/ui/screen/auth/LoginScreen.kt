@@ -32,12 +32,16 @@ import com.example.project.ui.viewmodel.LoginEvent
 import com.example.project.ui.viewmodel.LoginViewModel
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
-
+// This composable function defines the UI for the Login screen of the app.
 @OptIn(KoinExperimentalAPI::class, ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen() {
+    // Retrieve the LoginViewModel instance using Koin dependency injection
     val viewModel: LoginViewModel = koinViewModel()
+    // Collect the ViewModel's state as a Compose state to reactively update the UI
     val state by viewModel.state.collectAsState()
+
+    // Scaffold provides the basic layout structure with a top bar and content area
     Scaffold(
         topBar = {
             TopAppBar(

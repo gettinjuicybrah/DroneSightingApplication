@@ -10,8 +10,17 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-
+/**
+ * Repository for managing users in Firestore.
+ * Extends BaseFirestoreRepository to inherit common Firestore operations.
+ */
 class UserRepository : BaseFirestoreRepository<User>("users"), KoinComponent {
+    /**
+     * Converts a Firestore document into a User domain model.
+     *
+     * @param document The Firestore document snapshot.
+     * @return A User instance or null if conversion fails.
+     */
     override fun fromDocument(document: DocumentSnapshot): User? {
         return try {
             val userId = document.id

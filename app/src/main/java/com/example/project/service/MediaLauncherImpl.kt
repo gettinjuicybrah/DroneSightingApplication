@@ -22,7 +22,6 @@ import java.util.Locale
 
 class MediaLauncherImpl : MediaLauncher {
 
-    //added
     private var cameraLauncher: ActivityResultLauncher<Intent>? = null
     private var galleryLauncher: ActivityResultLauncher<Intent>? = null
     private var pendingCameraCallback: ((MediaResult) -> Unit)? = null

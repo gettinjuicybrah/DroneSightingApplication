@@ -10,7 +10,17 @@ import kotlinx.coroutines.flow.callbackFlow
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
+/**
+ * Repository for managing discussion comments in Firestore.
+ * Extends BaseFirestoreRepository to inherit common Firestore operations.
+ */
 class DiscussionCommentRepository : BaseFirestoreRepository<DiscussionComment>("discussions") {
+    /**
+     * Converts a Firestore document into a DiscussionComment domain model.
+     *
+     * @param document The Firestore document snapshot.
+     * @return A DiscussionComment instance or null if conversion fails.
+     */
     override fun fromDocument(document: DocumentSnapshot): DiscussionComment? {
         return try {
             val commentId = document.id
@@ -38,6 +48,14 @@ class DiscussionCommentRepository : BaseFirestoreRepository<DiscussionComment>("
             null
         }
     }
+    /**
+     * Retrieves all comments for a specific discussion from its "discussionComments" subcollection.
+     *
+     * @param discussionId The ID of the discussion.
+     * @param orderBy Optional field to order the results by.
+     * @param direction Optional direction for ordering.
+     * @return A Flow emitting a list of DiscussionComment objects.
+     */
     fun getDiscussionComments(discussionId: String, orderBy: String? = null, direction: Query.Direction? = null): Flow<List<DiscussionComment>> {
         return getSubCollection(discussionId, "discussionComments", orderBy, direction)
     }
